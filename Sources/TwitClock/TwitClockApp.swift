@@ -18,35 +18,54 @@ struct TwitClockApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        DispatchQueue.main.async {
-            if let window = NSApplication.shared.windows.first {
-                window.level = .floating
-                window.isMovableByWindowBackground = true
-                window.isOpaque = false
-                window.backgroundColor = .clear
-                window.hasShadow = false
-                window.titlebarAppearsTransparent = true
-                window.titleVisibility = .hidden
-                window.standardWindowButton(.closeButton)?.isHidden = true
-                window.standardWindowButton(.miniaturizeButton)?.isHidden = true
-                window.standardWindowButton(.zoomButton)?.isHidden = true
-            }
+        // Defer one tick so WindowGroup's window exists
+        Task { @MainActor in
+            guard let window = NSApplication.shared.windows.first else { return }
+            window.level = .floating
+            window.isMovableByWindowBackground = true
+            window.isOpaque = false
+            window.backgroundColor = .clear
+            window.hasShadow = false
+            window.titlebarAppearsTransparent = true
+            window.titleVisibility = .hidden
+            window.standardWindowButton(.closeButton)?.isHidden = true
+            window.standardWindowButton(.miniaturizeButton)?.isHidden = true
+            window.standardWindowButton(.zoomButton)?.isHidden = true
         }
     }
 }
 
-struct ContentView: View {
-    @State private var secondsRemaining: Int = 15 * 60
-    @State private var isContentPhase: Bool = true
+private let contentGreen = Color(red: 0.13, green: 0.77, blue: 0.37)
+private let adBreakRed = Color(red: 0.94, green: 0.27, blue: 0.27)
 
+struct CapsuleButton: ViewModifier {
+    let accentColor: Color
+    var monospaced: Bool = false
+
+    func body(content: Content) -> some View {
+        content
+            .buttonStyle(.plain)
+            .focusable(false)
+            .font(.system(size: 13, weight: .bold,
+                          design: monospaced ? .monospaced : .default))
+            .foregroundStyle(accentColor)
+            .frame(maxWidth: .infinity, minHeight: 22)
+            .background(.white)
+            .clipShape(Capsule())
+    }
+}
+
+struct ContentView: View {
     private let contentDuration = 15 * 60
     private let adBreakDuration = 90
-    private let snoozeDuration = 2 * 60
+
+    @State private var secondsRemaining: Int = 15 * 60
+    @State private var isContentPhase: Bool = true
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var backgroundColor: Color {
-        isContentPhase ? Color(red: 0.13, green: 0.77, blue: 0.37) : Color(red: 0.94, green: 0.27, blue: 0.27)
+        isContentPhase ? contentGreen : adBreakRed
     }
 
     private var phaseLabel: String {
@@ -91,35 +110,19 @@ struct ContentView: View {
                     .buttonStyle(.plain)
                     .focusable(false)
                 }
-                .font(.system(size: 13, weight: .bold, design: .monospaced))
-                .foregroundStyle(backgroundColor)
-                .frame(maxWidth: .infinity, minHeight: 22)
-                .background(.white)
-                .clipShape(Capsule())
+                .modifier(CapsuleButton(accentColor: backgroundColor, monospaced: true))
 
                 Button(action: { switchPhase() }) {
                     Text("\u{21C4}")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .buttonStyle(.plain)
-                .focusable(false)
-                .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(backgroundColor)
-                .frame(maxWidth: .infinity, minHeight: 22)
-                .background(.white)
-                .clipShape(Capsule())
+                .modifier(CapsuleButton(accentColor: backgroundColor))
 
                 Button(action: { NSApp.terminate(nil) }) {
                     Text("\u{2715}")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .buttonStyle(.plain)
-                .focusable(false)
-                .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(backgroundColor)
-                .frame(maxWidth: .infinity, minHeight: 22)
-                .background(.white)
-                .clipShape(Capsule())
+                .modifier(CapsuleButton(accentColor: backgroundColor))
             }
             .padding(.horizontal, 12)
             .padding(.bottom, 8)
