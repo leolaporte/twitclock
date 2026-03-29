@@ -7,9 +7,11 @@ struct TwitClockApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .fixedSize()
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
+        .defaultSize(width: 1, height: 1)
     }
 }
 
@@ -71,53 +73,56 @@ struct ContentView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
 
-            HStack {
-                Button(action: { adjustTime(by: 60) }) {
-                    Text("+")
-                        .font(.system(size: 13, weight: .bold, design: .monospaced))
-                        .foregroundStyle(backgroundColor)
-                        .frame(width: 26, height: 20)
-                        .background(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-                }
-                .buttonStyle(.plain)
+            HStack(spacing: 8) {
+                HStack(spacing: 0) {
+                    Button(action: { adjustTime(by: 60) }) {
+                        Text("+")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                    .buttonStyle(.plain)
+                    .focusable(false)
 
-                Button(action: { adjustTime(by: -60) }) {
-                    Text("\u{2212}")
-                        .font(.system(size: 13, weight: .bold, design: .monospaced))
-                        .foregroundStyle(backgroundColor)
-                        .frame(width: 26, height: 20)
-                        .background(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-                }
-                .buttonStyle(.plain)
+                    Divider().frame(height: 12).opacity(0.3)
 
-                Spacer()
+                    Button(action: { adjustTime(by: -60) }) {
+                        Text("\u{2212}")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                    .buttonStyle(.plain)
+                    .focusable(false)
+                }
+                .font(.system(size: 13, weight: .bold, design: .monospaced))
+                .foregroundStyle(backgroundColor)
+                .frame(maxWidth: .infinity, minHeight: 22)
+                .background(.white)
+                .clipShape(Capsule())
 
                 Button(action: { switchPhase() }) {
                     Text("\u{21C4}")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(backgroundColor)
-                        .frame(width: 26, height: 20)
-                        .background(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 .buttonStyle(.plain)
-
-                Spacer()
+                .focusable(false)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(backgroundColor)
+                .frame(maxWidth: .infinity, minHeight: 22)
+                .background(.white)
+                .clipShape(Capsule())
 
                 Button(action: { NSApp.terminate(nil) }) {
-                    Text("Q")
-                        .font(.system(size: 13, weight: .bold, design: .monospaced))
-                        .foregroundStyle(backgroundColor)
-                        .frame(width: 26, height: 20)
-                        .background(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                    Text("\u{2715}")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 .buttonStyle(.plain)
+                .focusable(false)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(backgroundColor)
+                .frame(maxWidth: .infinity, minHeight: 22)
+                .background(.white)
+                .clipShape(Capsule())
             }
             .padding(.horizontal, 12)
-            .padding(.bottom, 6)
+            .padding(.bottom, 8)
         }
         .background(backgroundColor.animation(.easeInOut(duration: 0.5)))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
