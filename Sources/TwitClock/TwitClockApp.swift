@@ -52,6 +52,7 @@ struct CapsuleButton: ViewModifier {
             .frame(maxWidth: .infinity, minHeight: 22)
             .background(.white)
             .clipShape(Capsule())
+            .contentShape(Capsule())
     }
 }
 
