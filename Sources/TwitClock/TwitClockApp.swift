@@ -31,6 +31,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             window.standardWindowButton(.closeButton)?.isHidden = true
             window.standardWindowButton(.miniaturizeButton)?.isHidden = true
             window.standardWindowButton(.zoomButton)?.isHidden = true
+            // Remove title bar completely to eliminate the top separator line
+            window.styleMask.remove(.titled)
         }
     }
 }
